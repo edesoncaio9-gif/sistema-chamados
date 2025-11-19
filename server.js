@@ -9,11 +9,6 @@ const dadosBasePath = path.join(__dirname, 'data', 'dados_base.json');
 const usuariosPath = path.join(__dirname, 'data', 'usuarios.json');
 const chamadosPath = path.join(__dirname, 'chamados.json'); 
 
-const dadosBase = JSON.parse(fs.readFileSync(dadosBasePath, 'utf8'));
-const usuarios = JSON.parse(fs.readFileSync(usuariosPath, 'utf8'));
-const chamados = JSON.parse(fs.readFileSync(chamadosPath, 'utf8'));
-
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -227,5 +222,6 @@ fazerBackupAutomático();
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor rodando em http://172.28.2.110:${PORT}`);
 });
+
 
 
