@@ -1,0 +1,27 @@
+/* Fundo da página */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: url('FUND.png.png') no-repeat center center fixed;
+  background-size: cover; /* cobre toda a tela */
+  font-family: Arial, sans-serif;
+}
+
+/* Centralização do formulário */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Estilo da caixa do formulário */
+form {
+  background: rgba(255, 255, 255, 0.95); /* branco com leve transparência */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 420px;
+}

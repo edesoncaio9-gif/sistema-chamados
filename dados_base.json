@@ -1,0 +1,193 @@
+{
+  "setores_responsaveis": {
+    "ARQUIVO": "RAFAEL.SANTOS",
+    "ASCOOM": "MATEUS.MACIEL",
+    "ASTEC": "NAYANE.REIS",
+    "CHGAB": "RONALDO.SILVA",
+    "CL": "SABATTA.MACEDO",
+    "CMDU": "SEBASTIAO.BARBOSA",
+    "CONTROLADORIA": "EDESON.VASCONCELOS"
+  },
+  "usuariosSetores": [
+    {
+      "usuario": "VALDETE",
+      "setor": "ARQUIVO"
+    },
+    {
+      "usuario": "EXTERNO",
+      "setor": "ASCOOM"
+    },
+    {
+      "usuario": "-",
+      "setor": "ASTEC"
+    },
+    {
+      "usuario": "RAFAEL",
+      "setor": "CHGAB"
+    },
+    {
+      "usuario": "DOUGLAS",
+      "setor": "CL"
+    },
+    {
+      "usuario": "JOSE.COIMBRA",
+      "setor": "CMDU"
+    },
+    {
+      "usuario": "KATTLEN.SILVA",
+      "setor": "CONTROLADORIA"
+    },
+    {
+      "usuario": "SAULO",
+      "setor": "CTPCU"
+    },
+    {
+      "usuario": "JEANE.MOTA",
+      "setor": "DIAF"
+    },
+    {
+      "usuario": "CYRILLO.FILHO",
+      "setor": "DIAP"
+    },
+    {
+      "usuario": "GABRIELLA.SILVA",
+      "setor": "DICON"
+    },
+    {
+      "usuario": "STANLEY",
+      "setor": "DIOP"
+    },
+    {
+      "usuario": "GABRIEL",
+      "setor": "DIPA"
+    },
+    {
+      "usuario": "GORETH",
+      "setor": "DIPU"
+    },
+    {
+      "usuario": "GERALDO.ROCHA",
+      "setor": "DIRAF"
+    },
+    {
+      "usuario": "RADJA.MAR",
+      "setor": "DOM"
+    },
+    {
+      "usuario": "LEANDRO",
+      "setor": "DPLA"
+    },
+    {
+      "usuario": "BIANCA.MOURA",
+      "setor": "GAPIS"
+    },
+    {
+      "usuario": "ARILAYNE",
+      "setor": "GCA"
+    },
+    {
+      "usuario": "ELAINE",
+      "setor": "GEAT"
+    },
+    {
+      "usuario": "ELIDIO",
+      "setor": "GEN"
+    },
+    {
+      "usuario": "ALBERTO",
+      "setor": "GEP"
+    },
+    {
+      "usuario": "ANNA JULIA",
+      "setor": "GFAP"
+    },
+    {
+      "usuario": "CLAUDIO.BELEM",
+      "setor": "GFO"
+    },
+    {
+      "usuario": "DIANA",
+      "setor": "GFP"
+    },
+    {
+      "usuario": "HEDNERY",
+      "setor": "GGP"
+    },
+    {
+      "usuario": "LUIZ EDUARDO",
+      "setor": "GIG"
+    },
+    {
+      "usuario": "ARISTEIA",
+      "setor": "GINF"
+    },
+    {
+      "usuario": "JONAS.CASTRO",
+      "setor": "GIT"
+    },
+    {
+      "usuario": "RAFAEL.SANTOS",
+      "setor": "GLT"
+    },
+    {
+      "usuario": "REJANE",
+      "setor": "GMU"
+    },
+    {
+      "usuario": "DULCE",
+      "setor": "GPH"
+    },
+    {
+      "usuario": "VITORIA",
+      "setor": "GPLAN"
+    },
+    {
+      "usuario": "SILVANA.GAMA",
+      "setor": "GPMS"
+    },
+    {
+      "usuario": "EMANUEL ",
+      "setor": "GPS"
+    },
+    {
+      "usuario": "ASHILEY DUARTE",
+      "setor": "OUVIDORIA"
+    },
+    {
+      "usuario": "AIDA DIOGENES",
+      "setor": "PRESID"
+    },
+    {
+      "usuario": "IRACEMA",
+      "setor": "PROJUR"
+    },
+    {
+      "usuario": "ROBERTO",
+      "setor": "VPRES"
+    },
+    {
+      "usuario": "MIRINEYDE",
+      "setor": "OUTROS"
+    },
+    {
+      "usuario": "AZIMAR",
+      "setor": "REPROGRAFIA"
+    }
+  ],
+  "equipamentos": [
+    "COMPUTADOR",
+    "IMPRESSORA",
+    "MONITOR",
+    "NOBREAK",
+    "NOTEBOOK",
+    "PONTO ELETRONICO",
+    "PROJETOR",
+    "ROTEADOR",
+    "SCANNER",
+    "SERVIDOR",
+    "SWITCH",
+    "NENHUM",
+    "RÉGUA",
+    "TELEFONE"
+  ]
+}
