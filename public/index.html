@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário de Chamado</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      height: 100%;
+    }
+
+    .header {
+      background-image: url(imagens/logo\ a\ esquerda.png);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .content-box {
+      margin-left: 220px;
+      margin-bottom: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: rgba(255,255,255,0.9);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .form-container {
+      width: 100%;
+    }
+
+    .form-container h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .form-container label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    .form-container input,
+    .form-container select,
+    .form-container textarea,
+    .form-container button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    .form-container textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-container button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      margin-top: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .form-container button:hover {
+      background-color: #0056b3;
+    }
+
+    #fila-container {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    #fila-container h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #fila-chamados li {
+      margin-bottom: 6px;
+      padding: 5px;
+      background-color: white;
+      border-radius: 5px;
+      list-style: none;
+      box-shadow: 0 0 3px rgba(0,0,0,0.1);
+    }
+
+    @media(max-width: 600px) {
+      .content-box {
+        max-width: 95%;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="content-box">
+      <div class="form-container">
+        <h1>Abertura de Chamado</h1>
+        <form id="chamadoForm">
+          <label for="usuario">Usuário:</label>
+          <select id="usuario" name="usuario" required></select>
+
+          <label for="setor">Setor:</label>
+          <select id="setor" name="setor" required></select>
+
+          <label for="equipamento">Equipamento:</label>
+          <select id="equipamento" name="equipamento" required></select>
+
+          
+          <label for="problema">Problema:</label>
+<textarea 
+    id="problema" 
+    name="problema" 
+    placeholder="detalhe sobre o problema" 
+    required 
+    rows="4" 
+    cols="50">
+</textarea>
+         
+
+          <button type="submit">Enviar Chamado</button>
+
+          <div style="text-align:center; margin-top: 15px;">
+            <button type="button" onclick="window.location.href='login.html'"
+                    style="background-color: #6c757d; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer;">
+              Sou Atendente
+            </button>
+          </div>
+        </form>
+
+        <!-- Botão para ver fila de chamados -->
+        <div style="text-align:center; margin-top: 20px;">
+          <button id="ver-fila" style="background-color:#28a745; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;">
+            Ver fila de chamados
+          </button>
+        </div>
+
+        <!-- Container da fila -->
+        <div id="fila-container">
+          <h2>Fila de Chamados</h2>
+          <ul id="fila-chamados"></ul>
+        </div>
+
+        <script>
+          async function carregarDadosBase() {
+            try {
+              const response = await fetch('/dados_base');
+              const dados = await response.json();
+
+              const usuarioSelect = document.getElementById('usuario');
+              const setorSelect = document.getElementById('setor');
+              const equipamentoSelect = document.getElementById('equipamento');
+
+              // Preencher usuários
+              dados.usuarios.forEach(u => {
+                const option = document.createElement('option');
+                option.value = u;
+                option.textContent = u;
+                usuarioSelect.appendChild(option);
+              });
+
+              // Preencher setores
+              Object.keys(dados.setores_responsaveis).forEach(setor => {
+                const option = document.createElement('option');
+                option.value = setor;
+                option.textContent = setor;
+                setorSelect.appendChild(option);
+              });
+
+              // Preencher equipamentos
+              dados.equipamentos.forEach(eq => {
+                const option = document.createElement('option');
+                option.value = eq;
+                option.textContent = eq;
+                equipamentoSelect.appendChild(option);
+              });
+
+            } catch (erro) {
+              console.error('Erro ao carregar dados_base:', erro);
+            }
+          }
+
+          document.addEventListener('DOMContentLoaded', carregarDadosBase);
+
+          document.getElementById('chamadoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const usuario = document.getElementById('usuario').value;
+            const setor = document.getElementById('setor').value;
+            const equipamento = document.getElementById('equipamento').value;
+            const problema = document.getElementById('problema').value;
+
+            const chamado = { usuario, setor, equipamento, problema };
+
+            try {
+              const resp = await fetch('/chamados', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(chamado)
+              });
+
+              if (!resp.ok) throw new Error('Erro ao salvar chamado');
+
+              alert('Chamado registrado com sucesso!');
+              document.getElementById('chamadoForm').reset();
+
+            } catch (err) {
+              alert('Falha ao registrar chamado: ' + err.message);
+            }
+          });
+
+          document.getElementById('ver-fila').addEventListener('click', async () => {
+            const container = document.getElementById('fila-container');
+            container.style.display = 'block';
+
+            try {
+              const resposta = await fetch('/fila-chamados');
+              const fila = await resposta.json();
+
+              const ul = document.getElementById('fila-chamados');
+              ul.innerHTML = '';
+
+              fila.forEach((chamado, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${chamado.usuario} - ${chamado.setor} - ${chamado.problema}`;
+                ul.appendChild(li);
+              });
+
+            } catch (erro) {
+              console.error('Erro ao carregar fila de chamados:', erro);
+            }
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
 
