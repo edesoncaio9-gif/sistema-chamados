@@ -1,1 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Atendente</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; }
+    .tabs { text-align: center; margin-bottom: 20px; }
+    .tabs button { margin: 0 5px; padding: 10px 20px; cursor: pointer; }
+    .chamado-card { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    .resolved { background-color: #e0ffe0; }
+    .actions { margin-top: 10px; }
+    select, button, input { margin-right: 5px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Painel do Atendente</h1>
+
+  <div class="tabs">
+    <button id="tab-abertos">Chamados Abertos</button>
+    <button id="tab-resolvidos">Chamados Resolvidos</button>
+  </div>
+
+  <div id="content-abertos"></div>
+  <div id="content-resolvidos" style="display:none;"></div>
+
+  <script>
+    let responsaveis = [];
+
+    
+    async function carregarResponsaveis() {
+      const response = await fetch('/dados_base');
+      const dadosBase = await response.json();
+      responsaveis = dadosBase.responsaveis || [];
+    }
+
+    async function carregarChamados() {
+      const response = await fetch('/chamados');
+      const chamados = await response.json();
+
+      const abertosDiv = document.getElementById('content-abertos');
+      const resolvidosDiv = document.getElementById('content-resolvidos');
+
+      abertosDiv.innerHTML = '';
+      resolvidosDiv.innerHTML = '';
+
+      chamados.forEach(chamado => {
+        const card = document.createElement('div');
+        card.classList.add('chamado-card');
+        if ((chamado.status || '').toLowerCase() === 'resolvido') card.classList.add('resolved');
+
+        card.innerHTML = `
+          <p><strong>Usuário:</strong> ${chamado.usuario}</p>
+          <p><strong>Setor:</strong> ${chamado.setor}</p>
+          <p><strong>Equipamento:</strong> ${chamado.equipamento}</p>
+          <p><strong>Problema:</strong> ${chamado.problema}</p>
+          <p><strong>Responsável:</strong> ${chamado.responsavel || '-'}</p>
+          <p><strong>Status:</strong> ${chamado.status || 'Aberto'}</p>
+        `;
+
+        if ((chamado.status || '').toLowerCase() !== 'resolvido') {
+          
+          const actionsDiv = document.createElement('div');
+          actionsDiv.classList.add('actions');
+
+          
+          const select = document.createElement('select');
+          select.innerHTML = `<option value="">Selecione o responsável</option>`;
+          responsaveis.forEach(nome => {
+            const option = document.createElement('option');
+            option.value = nome;
+            option.textContent = nome;
+            select.appendChild(option);
+          });
+
+          
+          const buttonAssumir = document.createElement('button');
+          buttonAssumir.textContent = 'Assumir Chamado';
+          buttonAssumir.onclick = async () => {
+            const resp = select.value;
+            if (!resp) return alert('Selecione um responsável');
+
+            await fetch(`/chamados/${chamado.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ responsavel: resp, status: 'Em andamento' })
+            });
+
+            carregarChamados();
+          };
+
+          
+          const comentarioInput = document.createElement('input');
+          comentarioInput.type = 'text';
+          comentarioInput.placeholder = 'Comentário sobre a solução';
+          comentarioInput.style.width = '60%';
+
+          
+          const buttonResolver = document.createElement('button');
+          buttonResolver.textContent = 'Marcar como Resolvido';
+          buttonResolver.onclick = async () => {
+            const comentario = comentarioInput.value.trim();
+            await fetch(`/chamados/${chamado.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'Resolvido', comentarioSolucao: comentario })
+            });
+            carregarChamados();
+          };
+
+          actionsDiv.appendChild(select);
+          actionsDiv.appendChild(buttonAssumir);
+          actionsDiv.appendChild(comentarioInput);
+          actionsDiv.appendChild(buttonResolver);
+
+          card.appendChild(actionsDiv);
+          abertosDiv.appendChild(card);
+
+        } else {
+         
+          if (chamado.comentarioSolucao) {
+            const comentarioDiv = document.createElement('p');
+            comentarioDiv.innerHTML = `<strong>Comentário:</strong> ${chamado.comentarioSolucao}`;
+            card.appendChild(comentarioDiv);
+          }
+          resolvidosDiv.appendChild(card);
+        }
+      });
+    }
+
+    
+    const tabAbertos = document.getElementById('tab-abertos');
+    const tabResolvidos = document.getElementById('tab-resolvidos');
+    const contentAbertos = document.getElementById('content-abertos');
+    const contentResolvidos = document.getElementById('content-resolvidos');
+
+    tabAbertos.onclick = () => {
+      contentAbertos.style.display = 'block';
+      contentResolvidos.style.display = 'none';
+    };
+
+    tabResolvidos.onclick = () => {
+      contentAbertos.style.display = 'none';
+      contentResolvidos.style.display = 'block';
+    };
+
+  
+    async function init() {
+      await carregarResponsaveis();
+      carregarChamados();
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
 
