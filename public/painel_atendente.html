@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="imagens/Brasao.png">
+  <meta charset="UTF-8">
+  <title>Painel do Atendente</title>
+  <style>
+.btn-voltar {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.btn-voltar:hover {
+  background-color: #0056b3;
+}
+
+body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; }
+    .tabs { text-align: center; margin-bottom: 20px; }
+    .tabs button { margin: 0 5px; padding: 10px 20px; cursor: pointer; }
+    .chamado-card { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    .resolved { background-color: #e0ffe0; }
+    .actions { margin-top: 10px; }
+    select, button, input { margin-right: 5px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+   <button id="voltarIndex" class="btn-voltar">🏠 Voltar ao Início</button>
+  <h1>PAINEL DO ATENDENTE</h1>
+
+  <div class="tabs">
+    <button id="tab-abertos">Chamados Abertos</button>
+    <button id="tab-resolvidos">Chamados Resolvidos</button>
+  </div>
+
+  <div id="content-abertos"></div>
+  <div id="content-resolvidos" style="display:none;"></div>
+
+  <!-- Botão de relatório -->
+<div style="margin: 20px 0; text-align:center;">
+  <button id="btn-relatorio" style="background-color:#17a2b8; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;">
+    Gerar Relatório
+  </button>
+</div>
+
+<!-- Container do relatório -->
+<div id="relatorio-container" style="display:none; margin-top:10px;">
+  <h2>Relatório de Chamados</h2>
+  <table id="tabela-relatorio" border="1" style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Aberto em</th>
+        <th>Usuário</th>
+        <th>Setor</th>
+        <th>Equipamento</th>
+        <th>Status</th>
+        <th>Responsável</th>
+        <th>Resolvido em</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+
+  </table>
+  <button id="export-csv" style="margin-top:10px; background-color:#ffc107; color:#343a40; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
+    Exportar CSV
+  </button>
+</div>
+
+<script>
+async function gerarRelatorio() {
+    try {
+      const resposta = await fetch('/fila-chamados');
+      const chamados = await resposta.json();
+
+      const tbody = document.querySelector('#tabela-relatorio tbody');
+      tbody.innerHTML = '';
+
+      chamados.forEach(chamado => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${chamado.id || ''}</td>
+          <td>${chamado.dataAbertura ? new Date(chamado.dataAbertura).toLocaleString('pt-BR') : ''}</td>
+          <td>${chamado.usuario || ''}</td>
+          <td>${chamado.setor || ''}</td>
+          <td>${chamado.equipamento || ''}</td>
+          <td>${chamado.status || 'Aberto'}</td>
+          <td>${chamado.responsavel || ''}</td>
+          <td>${chamado.dataFinalizacao ? new Date(chamado.dataFinalizacao).toLocaleString('pt-BR') : ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('relatorio-container').style.display = 'block';
+    } catch (erro) {
+      console.error('Erro ao gerar relatório:', erro);
+    }
+  }
+
+  // ✅ Exportar CSV corrigido para Excel PT-BR
+  document.getElementById('export-csv').addEventListener('click', async () => {
+    try {
+      const resposta = await fetch('/fila-chamados');
+      const chamados = await resposta.json();
+
+      if (!chamados.length) {
+        alert("Nenhum chamado encontrado para exportar.");
+        return;
+      }
+
+      const header = ["ID", "Usuário", "Setor", "Equipamento", "Status", "Responsável", "Aberto em", "Resolvido em", "Solução"];
+
+      const rows = chamados.map(ch => [
+        ch.id || "",
+        ch.usuario || "",
+        ch.setor || "",
+        ch.equipamento || "",
+        ch.status || "Aberto",
+        ch.responsavel || "",
+        ch.dataAbertura ? new Date(ch.dataAbertura).toLocaleString('pt-BR') : "",
+        ch.dataFinalizacao ? new Date(ch.dataFinalizacao).toLocaleString('pt-BR') : "",
+        ch.comentarioSolucao || ""
+      ]);
+
+      // CSV com delimitador ; e BOM UTF-8
+      let csv = [header, ...rows]
+        .map(row => row.map(col => `"${String(col).replace(/"/g, '""')}"`).join(";"))
+        .join("\n");
+
+      const csvFile = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(csvFile);
+      downloadLink.download = "relatorio_chamados.csv";
+      downloadLink.click();
+
+    } catch (erro) {
+      console.error('Erro ao exportar CSV:', erro);
+    }
+  });
+
+  document.getElementById('btn-relatorio').addEventListener('click', gerarRelatorio);
+
+</script>
+
+<script>
+  let responsaveis = [];
+
+  async function carregarResponsaveis() {
+    const response = await fetch('/dados_base');
+    const dadosBase = await response.json();
+    responsaveis = dadosBase.responsaveis || [];
+  }
+
+  async function carregarChamados() {
+    const response = await fetch('/chamados');
+    const chamados = await response.json();
+
+      // Ordenar por data de abertura (mais recentes primeiro)
+  chamados.sort((a, b) => new Date(b.dataAbertura) - new Date(a.dataAbertura));
+
+
+    const abertosDiv = document.getElementById('content-abertos');
+    const resolvidosDiv = document.getElementById('content-resolvidos');
+
+    abertosDiv.innerHTML = '';
+    resolvidosDiv.innerHTML = '';
+
+chamados.forEach(chamado => {
+  const card = document.createElement('div');
+  card.classList.add('chamado-card');
+  if ((chamado.status || '').toLowerCase() === 'resolvido') card.classList.add('resolved');
+
+  // 🔹 Converter todos os campos para MAIÚSCULO
+  const usuario = (chamado.usuario || '').toUpperCase();
+  const setor = (chamado.setor || '').toUpperCase();
+  const equipamento = (chamado.equipamento || '').toUpperCase();
+  const problema = (chamado.problema || '').toUpperCase();
+  const responsavel = (chamado.responsavel || '-').toUpperCase();
+  const status = (chamado.status || 'ABERTO').toUpperCase();
+
+  // 🔹 Formatar datas
+  const dataAbertura = chamado.dataAbertura ? new Date(chamado.dataAbertura).toLocaleString('pt-BR') : '-';
+  const dataFechamento = chamado.dataFinalizacao ? new Date(chamado.dataFinalizacao).toLocaleString('pt-BR') : '-';
+
+  // 🔹 Estrutura principal do card
+  card.innerHTML = `
+    <p><strong>ID:</strong> ${chamado.id || '-'}</p>
+    <p><strong>Data de Abertura:</strong> ${dataAbertura}</p>
+    <p><strong>Usuário:</strong> ${usuario}</p>
+    <p><strong>Setor:</strong> ${setor}</p>
+    <p><strong>Equipamento:</strong> ${equipamento}</p>
+    <p><strong>Problema:</strong> ${problema}</p>
+    <p><strong>Responsável:</strong> ${responsavel}</p>
+    <p><strong>Status:</strong> ${status}</p>
+    <p><strong>Data de Fechamento:</strong> ${dataFechamento}</p>
+  `;
+
+  if (status !== 'RESOLVIDO') {
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('actions');
+
+    const select = document.createElement('select');
+    select.innerHTML = `<option value="">Selecione o responsável</option>`;
+    responsaveis.forEach(nome => {
+      const option = document.createElement('option');
+      option.value = nome;
+      option.textContent = nome;
+      select.appendChild(option);
+    });
+
+    const buttonAssumir = document.createElement('button');
+    buttonAssumir.textContent = 'Assumir Chamado';
+    buttonAssumir.onclick = async () => {
+      const responsavelSelecionado = select.value;
+      if (!responsavelSelecionado) return alert('Selecione um responsável');
+
+      await fetch(`/chamados/${chamado.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          responsavel: responsavelSelecionado,
+          status: "Em andamento"
+        })
+      });
+carregarChamados();
+    };
+
+    const comentarioInput = document.createElement('input');
+    comentarioInput.type = 'text';
+    comentarioInput.placeholder = 'Comentário sobre a solução';
+    comentarioInput.style.width = '60%';
+
+    const buttonResolver = document.createElement('button');
+    buttonResolver.textContent = 'Marcar como Resolvido';
+    buttonResolver.onclick = async () => {
+      const comentario = comentarioInput.value.trim();
+      let responsavelSelecionado = chamado.responsavel;
+
+      if (!responsavelSelecionado || responsavelSelecionado === '') {
+        responsavelSelecionado = select.value;
+      }
+
+      await fetch(`/chamados/${chamado.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          status: 'Resolvido',
+          comentarioSolucao: comentario,
+          responsavel: responsavelSelecionado || chamado.responsavel || ''
+        })
+      });
+      carregarChamados();
+    };
+
+    // 🔹 Botão Editar Chamado
+    const buttonEditar = document.createElement('button');
+    buttonEditar.textContent = 'Editar Chamado';
+    buttonEditar.onclick = () => {
+      const campos = [
+        { label: 'Usuário', valor: chamado.usuario, chave: 'usuario' },
+        { label: 'Setor', valor: chamado.setor, chave: 'setor' },
+        { label: 'Equipamento', valor: chamado.equipamento, chave: 'equipamento' },
+        { label: 'Problema', valor: chamado.problema, chave: 'problema' }
+      ];
+
+      card.innerHTML = ''; // limpa o card
+
+      campos.forEach(c => {
+        const p = document.createElement('p');
+        p.innerHTML = `<strong>${c.label}:</strong> <input type="text" id="edit-${c.chave}" value="${c.valor}" style="width:70%;">`;
+        card.appendChild(p);
+      });
+
+      const salvarBtn = document.createElement('button');
+      salvarBtn.textContent = 'Salvar Alterações';
+      salvarBtn.style.backgroundColor = '#28a745';
+      salvarBtn.style.color = 'white';
+      salvarBtn.style.marginRight = '5px';
+      salvarBtn.onclick = async () => {
+        const dadosAtualizados = {
+    usuario: document.getElementById('edit-usuario').value.trim(),
+    setor: document.getElementById('edit-setor').value.trim(),
+    equipamento: document.getElementById('edit-equipamento').value.trim(),
+    problema: document.getElementById('edit-problema').value.trim(),
+    responsavel: chamado.responsavel || '',
+    status: chamado.status || 'Aberto',
+    comentarioSolucao: chamado.comentarioSolucao || '',
+    dataAbertura: chamado.dataAbertura,
+    dataFinalizacao: chamado.dataFinalizacao || null
+  };
+
+  const resposta = await fetch(`/chamados/${chamado.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dadosAtualizados)
+  });
+
+  if (resposta.ok) {
+    alert('Chamado atualizado com sucesso!');
+    carregarChamados();
+  } else {
+    alert('Erro ao atualizar o chamado.');
+  }
+};
+
+      const cancelarBtn = document.createElement('button');
+      cancelarBtn.textContent = 'Cancelar';
+      cancelarBtn.style.backgroundColor = '#dc3545';
+      cancelarBtn.style.color = 'white';
+      cancelarBtn.onclick = carregarChamados;
+
+      card.appendChild(salvarBtn);
+      card.appendChild(cancelarBtn);
+    };
+
+    actionsDiv.appendChild(select);
+    actionsDiv.appendChild(buttonAssumir);
+    actionsDiv.appendChild(comentarioInput);
+    actionsDiv.appendChild(buttonResolver);
+    actionsDiv.appendChild(buttonEditar);
+    card.appendChild(actionsDiv);
+    abertosDiv.appendChild(card);
+
+  } else {
+    if (chamado.comentarioSolucao) {
+      const comentarioDiv = document.createElement('p');
+      comentarioDiv.innerHTML = `<strong>Solução:</strong> ${chamado.comentarioSolucao.toUpperCase()}`;
+      card.appendChild(comentarioDiv);
+    }
+    resolvidosDiv.appendChild(card);
+  }
+});
+  }
+
+  const tabAbertos = document.getElementById('tab-abertos');
+  const tabResolvidos = document.getElementById('tab-resolvidos');
+  const contentAbertos = document.getElementById('content-abertos');
+  const contentResolvidos = document.getElementById('content-resolvidos');
+
+  tabAbertos.onclick = () => {
+    contentAbertos.style.display = 'block';
+    contentResolvidos.style.display = 'none';
+  };
+
+  tabResolvidos.onclick = () => {
+    contentAbertos.style.display = 'none';
+    contentResolvidos.style.display = 'block';
+  };
+
+  async function init() {
+    await carregarResponsaveis();
+    carregarChamados();
+  }
+
+
+async function verificarAvisoBackup() {
+  try {
+    const resposta = await fetch('/avisos-backup');
+    const data = await resposta.json();
+
+    if (data.aviso) {
+      // Cria um banner de aviso no topo do painel
+      const banner = document.createElement('div');
+      banner.style.backgroundColor = '#ffc107';
+      banner.style.color = '#343a40';
+      banner.style.padding = '10px';
+      banner.style.marginBottom = '15px';
+      banner.style.textAlign = 'center';
+      banner.style.borderRadius = '6px';
+      banner.innerText = `Atenção! ${data.total} chamados serão arquivados amanhã.`;
+      document.body.insertBefore(banner, document.body.firstChild);
+    }
+  } catch (err) {
+    console.error('Erro ao verificar aviso de backup:', err);
+  }
+}
+
+// Chamar junto com init
+init().then(() => verificarAvisoBackup());
+
+</script>
+<script>
+  document.getElementById("voltarIndex").addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+</script>
+
+</body>
+</html>
