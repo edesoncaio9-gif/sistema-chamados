@@ -216,5 +216,5 @@ fazerBackupAutomático();
 
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor rodando em http://172.28.2.110:${PORT}`);
+  console.log(`Servidor rodando em http://172.28.4.149:3000`);
 });

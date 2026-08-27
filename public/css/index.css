@@ -1,0 +1,112 @@
+/* Fundo da página inicial com a imagem de identidade visual. */
+body.page-index {
+  min-height: 100vh;
+  background: #fff url('../imagens/logo a esquerda.png') center / cover fixed no-repeat;
+}
+
+/* Centraliza o conteúdo principal vertical e horizontalmente. */
+.header {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 20px;
+}
+
+/* Caixa translúcida que contém o formulário da página inicial. */
+.content-box {
+  width: min(100%, 460px);
+  margin-left: 220px;
+  margin-bottom: 80px;
+  padding: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(8px);
+}
+
+/* Estrutura e tipografia do formulário. */
+.form-container { width: 100%; }
+.form-container h1 {
+  margin: 0 0 24px;
+  color: var(--color-primary-dark);
+  font-family: 'Space Grotesk', Arial, sans-serif;
+  font-size: 22px;
+  text-align: center;
+}
+.form-container label {
+  display: block;
+  margin: 15px 0 6px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+/* Campos de texto, seleção e descrição ocupam toda a largura disponível. */
+.form-container input,
+.form-container select,
+.form-container textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--color-ink);
+  outline: 0;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(18, 97, 160, 0.14);
+}
+/* Permite aumentar a área de descrição apenas na direção vertical. */
+.form-container textarea { min-height: 100px; resize: vertical; }
+.form-container button[type='submit'],
+.acoes-atendente button,
+.acoes-fila button {
+  width: 100%;
+}
+.form-container button[type='submit'] { margin-top: 22px; }
+/* Campo opcional exibido quando o usuário escolhe criar uma conta. */
+.campo-novo-usuario { display: none; margin-top: 8px; }
+.campo-novo-usuario.is-visible { display: block; }
+.acoes-atendente, .acoes-fila { text-align: center; }
+.acoes-atendente { margin-top: 14px; }
+.acoes-fila { margin-top: 20px; }
+
+/* Área da fila de chamados: começa oculta e pode rolar quando fica grande. */
+#fila-container {
+  display: none;
+  width: 100%;
+  max-height: 340px;
+  margin-top: 22px;
+  padding: 12px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #f4f7f9;
+}
+#fila-container.is-visible { display: block; }
+/* Título, lista e itens individuais da fila. */
+#fila-container h2 { margin: 4px 0 14px; font-family: 'Space Grotesk', Arial, sans-serif; font-size: 18px; text-align: center; }
+#fila-chamados { margin: 0; padding: 0; }
+#fila-chamados li {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 9px;
+  padding: 11px;
+  border: 1px solid #e3e8ec;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  list-style: none;
+}
+/* Organiza a primeira linha de informações e textos auxiliares. */
+.top-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.meta { color: var(--color-muted); font-size: 12px; }
+
+@media (max-width: 700px) {
+  .content-box { margin: 0; padding: 24px 20px; }
+}

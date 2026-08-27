@@ -4,37 +4,11 @@
   <link rel="icon" href="imagens/Brasao.png">
   <meta charset="UTF-8">
   <title>Painel do Atendente</title>
-  <style>
-.btn-voltar {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-}
-
-.btn-voltar:hover {
-  background-color: #0056b3;
-}
-
-body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { text-align: center; }
-    .tabs { text-align: center; margin-bottom: 20px; }
-    .tabs button { margin: 0 5px; padding: 10px 20px; cursor: pointer; }
-    .chamado-card { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; }
-    .resolved { background-color: #e0ffe0; }
-    .actions { margin-top: 10px; }
-    select, button, input { margin-right: 5px; margin-top: 5px; }
-  </style>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/painel-atendente.css">
 </head>
-<body>
-   <button id="voltarIndex" class="btn-voltar">🏠 Voltar ao Início</button>
+<body class="page-painel">
+  <button id="voltarIndex" class="btn btn-primary btn-voltar">Voltar ao Início</button>
   <h1>PAINEL DO ATENDENTE</h1>
 
   <div class="tabs">
@@ -43,36 +17,37 @@ body { font-family: Arial, sans-serif; margin: 20px; }
   </div>
 
   <div id="content-abertos"></div>
-  <div id="content-resolvidos" style="display:none;"></div>
+  <div id="content-resolvidos" class="is-hidden"></div>
 
   <!-- Botão de relatório -->
-<div style="margin: 20px 0; text-align:center;">
-  <button id="btn-relatorio" style="background-color:#17a2b8; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;">
+<div class="relatorios-acoes">
+  <button id="btn-relatorio" class="btn btn-info">
     Gerar Relatório
   </button>
 </div>
 
 <!-- Container do relatório -->
-<div id="relatorio-container" style="display:none; margin-top:10px;">
-  <h2>Relatório de Chamados</h2>
-  <table id="tabela-relatorio" border="1" style="width:100%; border-collapse:collapse;">
+<div id="relatorio-container">
+  <h2>RELATÓRIO DE CHAMADOS</h2>
+  <table id="tabela-relatorio">
     <thead>
       <tr>
         <th>ID</th>
-        <th>Aberto em</th>
-        <th>Usuário</th>
-        <th>Setor</th>
-        <th>Equipamento</th>
-        <th>Status</th>
-        <th>Responsável</th>
-        <th>Resolvido em</th>
+        <th>ABERTO EM</th>
+        <th>USUÁRIO</th>
+        <th>SETOR</th>
+        <th>EQUIPAMENTO</th>
+        <th>STATUS</th>
+        <th>RESPONSÁVEL</th>
+        <th>RESOLVIDO EM</th>
+        <th>SOLUÇÃO</th>
       </tr>
     </thead>
     <tbody></tbody>
 
   </table>
-  <button id="export-csv" style="margin-top:10px; background-color:#ffc107; color:#343a40; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
-    Exportar CSV
+  <button id="export-csv" class="btn btn-warning">
+    EXPORTAR CSV
   </button>
 </div>
 
@@ -96,11 +71,12 @@ async function gerarRelatorio() {
           <td>${chamado.status || 'Aberto'}</td>
           <td>${chamado.responsavel || ''}</td>
           <td>${chamado.dataFinalizacao ? new Date(chamado.dataFinalizacao).toLocaleString('pt-BR') : ''}</td>
+          <td>${chamado.comentarioSolucao || ''}</td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById('relatorio-container').style.display = 'block';
+      document.getElementById('relatorio-container').classList.add('is-visible');
     } catch (erro) {
       console.error('Erro ao gerar relatório:', erro);
     }
@@ -110,6 +86,10 @@ async function gerarRelatorio() {
   document.getElementById('export-csv').addEventListener('click', async () => {
     try {
       const resposta = await fetch('/fila-chamados');
+      if (!resposta.ok) {
+        throw new Error('Não foi possível carregar os chamados para exportação.');
+      }
+
       const chamados = await resposta.json();
 
       if (!chamados.length) {
@@ -237,7 +217,7 @@ carregarChamados();
     const comentarioInput = document.createElement('input');
     comentarioInput.type = 'text';
     comentarioInput.placeholder = 'Comentário sobre a solução';
-    comentarioInput.style.width = '60%';
+    comentarioInput.className = 'input-solucao';
 
     const buttonResolver = document.createElement('button');
     buttonResolver.textContent = 'Marcar como Resolvido';
@@ -249,16 +229,25 @@ carregarChamados();
         responsavelSelecionado = select.value;
       }
 
-      await fetch(`/chamados/${chamado.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          status: 'Resolvido',
-          comentarioSolucao: comentario,
-          responsavel: responsavelSelecionado || chamado.responsavel || ''
-        })
-      });
-      carregarChamados();
+      try {
+        const resposta = await fetch(`/chamados/${chamado.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            status: 'Resolvido',
+            comentarioSolucao: comentario,
+            responsavel: responsavelSelecionado || chamado.responsavel || ''
+          })
+        });
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível salvar a solução.');
+        }
+
+        await carregarChamados();
+      } catch (erro) {
+        alert(erro.message);
+      }
     };
 
     // 🔹 Botão Editar Chamado
@@ -276,15 +265,13 @@ carregarChamados();
 
       campos.forEach(c => {
         const p = document.createElement('p');
-        p.innerHTML = `<strong>${c.label}:</strong> <input type="text" id="edit-${c.chave}" value="${c.valor}" style="width:70%;">`;
+        p.innerHTML = `<strong>${c.label}:</strong> <input type="text" class="input-edicao" id="edit-${c.chave}" value="${c.valor}">`;
         card.appendChild(p);
       });
 
       const salvarBtn = document.createElement('button');
       salvarBtn.textContent = 'Salvar Alterações';
-      salvarBtn.style.backgroundColor = '#28a745';
-      salvarBtn.style.color = 'white';
-      salvarBtn.style.marginRight = '5px';
+      salvarBtn.className = 'btn btn-success';
       salvarBtn.onclick = async () => {
         const dadosAtualizados = {
     usuario: document.getElementById('edit-usuario').value.trim(),
@@ -314,8 +301,7 @@ carregarChamados();
 
       const cancelarBtn = document.createElement('button');
       cancelarBtn.textContent = 'Cancelar';
-      cancelarBtn.style.backgroundColor = '#dc3545';
-      cancelarBtn.style.color = 'white';
+      cancelarBtn.className = 'btn btn-danger';
       cancelarBtn.onclick = carregarChamados;
 
       card.appendChild(salvarBtn);
@@ -347,13 +333,13 @@ carregarChamados();
   const contentResolvidos = document.getElementById('content-resolvidos');
 
   tabAbertos.onclick = () => {
-    contentAbertos.style.display = 'block';
-    contentResolvidos.style.display = 'none';
+    contentAbertos.classList.remove('is-hidden');
+    contentResolvidos.classList.add('is-hidden');
   };
 
   tabResolvidos.onclick = () => {
-    contentAbertos.style.display = 'none';
-    contentResolvidos.style.display = 'block';
+    contentAbertos.classList.add('is-hidden');
+    contentResolvidos.classList.remove('is-hidden');
   };
 
   async function init() {
@@ -370,12 +356,7 @@ async function verificarAvisoBackup() {
     if (data.aviso) {
       // Cria um banner de aviso no topo do painel
       const banner = document.createElement('div');
-      banner.style.backgroundColor = '#ffc107';
-      banner.style.color = '#343a40';
-      banner.style.padding = '10px';
-      banner.style.marginBottom = '15px';
-      banner.style.textAlign = 'center';
-      banner.style.borderRadius = '6px';
+      banner.className = 'banner-backup';
       banner.innerText = `Atenção! ${data.total} chamados serão arquivados amanhã.`;
       document.body.insertBefore(banner, document.body.firstChild);
     }

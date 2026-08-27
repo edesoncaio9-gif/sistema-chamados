@@ -4,96 +4,45 @@
 <meta charset="UTF-8" />
 <link rel="icon" href="imagens/Brasao.png">
 <title>CHAMAR</title>
-<link rel="stylesheet" href="style.css" />
-<style>
-/* Status chips */
-.status-chip {
-  display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
-  line-height: 18px; border: 1px solid transparent;
-}
-.status-aberto { background-color: #e9ecef; color: #343a40; }
-.status-em-andamento { background-color: #fff3cd; color: #664d03; }
-.status-aguardando-pecas { background-color: #f8d7da; color: #842029; }
-.status-resolvido { background-color: #198754; color: white; }
-
-/* Layout geral */
-body, html { margin: 0; padding: 0; font-family: Arial, sans-serif; height: 100%; }
-.header {
-  background-image: url(imagens/logo\ a\ esquerda.png);
-  background-size: cover; background-repeat: no-repeat; background-position: center;
-  min-height: 100vh; display: flex; justify-content: center; align-items: center;
-  padding: 20px; box-sizing: border-box;
-}
-.content-box {
-  margin-left: 220px; margin-bottom: 110px; display: flex; flex-direction: column; align-items: center;
-  background-color: rgba(255,255,255,0.9); padding: 30px; border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3); width: 90%; max-width: 400px;
-}
-.form-container { width: 100%; }
-.form-container h1 { text-align: center; margin-bottom: 20px; font-size: 20px; }
-.form-container label { display: block; margin-top: 10px; }
-.form-container input, .form-container select, .form-container textarea, .form-container button {
-  width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px;
-}
-.form-container textarea { resize: vertical; min-height: 80px; }
-.form-container button { background-color: #007BFF; color: white; border: none; margin-top: 15px; cursor: pointer; font-weight: bold; }
-.form-container button:hover { background-color: #0056b3; }
-
-/* Fila de chamados */
-#fila-container {
-  margin-top: 20px; width: 100%; background-color: #f1f1f1;
-  padding: 10px; border-radius: 8px; max-height: 340px; overflow-y: auto; display: none;
-}
-#fila-container h2 { text-align: center; margin-bottom: 10px; }
-#fila-chamados li {
-  margin-right: 24px;
-  margin-bottom: 8px; padding: 8px 10px; background-color: white; border-radius: 8px; list-style: none;
-  box-shadow: 0 0 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 4px;
-}
-
-.top-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.meta { font-size: 12px; color: #555; }
-
-@media(max-width: 600px) { .content-box { max-width: 95%; padding: 20px; } }
-</style>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/index.css">
 </head>
-<body>
+<body class="page-index">
 <div class="header">
 <div class="content-box">
 <div class="form-container">
-<h1>ABERTURA DE CHAMADO</h1>
+<h1>REGISTRO DE CHAMADO</h1>
 <form id="chamadoForm">
-  <label for="usuario">Usuário:</label>
+  <label for="usuario">USUÁRIO:</label>
   <select id="usuario" name="usuario" required></select>
-  <input type="text" id="novo-usuario" placeholder="Digite seu nome" style="display:none;" />
+  <input type="text" id="novo-usuario" class="campo-novo-usuario" placeholder="Digite seu nome" />
 
-  <label for="setor">Setor:</label>
+  <label for="setor">SETOR:</label>
   <select id="setor" name="setor" required></select>
 
-  <label for="equipamento">Equipamento:</label>
+  <label for="equipamento">EQUIPAMENTO:</label>
   <select id="equipamento" name="equipamento" required></select>
 
-  <label for="problema">Problema:</label>
-  <textarea id="problema" name="problema" placeholder="detalhe sobre o problema" required rows="4" cols="50"></textarea>
+  <label for="problema">PROBLEMA:</label>
+  <textarea id="problema" name="problema" placeholder="DETALHE SOBRE O PROBLEMA" required rows="4" cols="50"></textarea>
 
-  <button type="submit">Enviar Chamado</button>
+  <button type="submit" class="btn btn-primary">ENVIAR CHAMADO</button>
 
-  <div style="text-align:center; margin-top: 15px;">
-    <button type="button" onclick="window.location.href='login.html'"
-      style="background-color: #6c757d; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer;">
-      Sou Atendente
+  <div class="acoes-atendente">
+    <button type="button" class="btn btn-secondary" onclick="window.location.href='login.html'">
+      SOU ATENDENTE
     </button>
   </div>
 </form>
 
-<div style="text-align:center; margin-top: 20px;">
-  <button id="ver-fila" style="background-color:#28a745; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;">
-    Ver fila de chamados
+<div class="acoes-fila">
+  <button id="ver-fila" class="btn btn-success">
+    VER FILA DE CHAMADOS
   </button>
 </div>
 
 <div id="fila-container">
-  <h2>Fila de Chamados</h2>
+  <h2>FILA DE CHAMADOS</h2>
   <ul id="fila-chamados"></ul>
 </div>
 </div>
@@ -155,9 +104,9 @@ usuarioSelect.appendChild(placeholderOpt);
 
     usuarioSelect.addEventListener('change', () => {
       if (usuarioSelect.value === 'novo_usuario') {
-        inputNovoUsuario.style.display = 'block';
+        inputNovoUsuario.classList.add('is-visible');
       } else {
-        inputNovoUsuario.style.display = 'none';
+        inputNovoUsuario.classList.remove('is-visible');
       }
     });
 
@@ -214,7 +163,7 @@ document.getElementById('chamadoForm').addEventListener('submit', async (e) => {
       }
 
       usuario = novoNome;
-      inputNovoUsuario.style.display = 'none';
+      inputNovoUsuario.classList.remove('is-visible');
 
       // Atualiza apenas o select de usuários
       const usuariosAtualizados = await (await fetch('/usuarios')).json();
@@ -304,7 +253,7 @@ meta.innerHTML = html;
       ul.appendChild(li);
     });
 
-    if (fila.length > 0) container.style.display = 'block';
+    if (fila.length > 0) container.classList.add('is-visible');
 
   } catch (erro) {
     console.error('Erro ao carregar fila de chamados:', erro);
@@ -314,11 +263,11 @@ meta.innerHTML = html;
 // Botão "Ver fila"
 document.getElementById('ver-fila').addEventListener('click', async () => {
   const container = document.getElementById('fila-container');
-  if (container.style.display === 'block') {
-    container.style.display = 'none';
+  if (container.classList.contains('is-visible')) {
+    container.classList.remove('is-visible');
   } else {
     await renderizarFilaChamados();
-    container.style.display = 'block';
+    container.classList.add('is-visible');
   }
 });
 

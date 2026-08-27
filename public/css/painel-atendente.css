@@ -1,0 +1,41 @@
+/* Layout geral do painel usado pelo atendente. */
+body.page-painel {
+  min-height: 100vh;
+  padding: 32px clamp(18px, 4vw, 60px);
+  background: #fff;
+}
+
+/* Títulos e botão para voltar à tela anterior. */
+h1, h2 { font-family: 'Space Grotesk', Arial, sans-serif; }
+h1 { margin: 12px 0 26px; color: var(--color-primary-dark); text-align: center; }
+.btn-voltar { position: absolute; top: 18px; right: 18px; }
+/* Abas de navegação entre as áreas do painel. */
+.tabs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+.tabs button { border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 10px 18px; background: #fff; color: var(--color-primary-dark); font-weight: 700; }
+.tabs button:hover { background: #eaf2f7; }
+/* Cartão individual de chamado e indicação visual para chamados resolvidos. */
+.chamado-card { margin: 12px 0; padding: 18px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; box-shadow: 0 6px 18px rgba(20, 46, 68, 0.06); }
+.chamado-card p { margin: 7px 0; }
+.resolved { border-left: 5px solid var(--color-success); background: #f0faf5; }
+/* Controles para atualizar status, informar solução e executar ações. */
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.actions select, .actions input { flex: 1 1 180px; min-width: 0; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.input-solucao { flex: 1 1 240px; }
+.actions button { border: 0; border-radius: var(--radius-sm); padding: 10px 13px; background: var(--color-primary); color: #fff; font-weight: 700; }
+/* Área de ações dos relatórios e aviso de backup. */
+.relatorios-acoes { margin: 24px 0; text-align: center; }
+.banner-backup { margin-bottom: 15px; padding: 10px; border-radius: var(--radius-sm); background: #ffc107; color: #343a40; text-align: center; }
+/* Relatório e tabela: ficam ocultos até serem solicitados e permitem rolagem horizontal. */
+#relatorio-container { display: none; margin-top: 14px; overflow-x: auto; }
+#relatorio-container.is-visible { display: block; }
+#tabela-relatorio { width: 100%; border-collapse: collapse; background: #fff; }
+#tabela-relatorio th, #tabela-relatorio td { padding: 10px; border: 1px solid var(--color-border); text-align: left; }
+#tabela-relatorio th { background: var(--color-primary-dark); color: #fff; }
+#export-csv { margin-top: 10px; }
+.input-edicao { width: 70%; padding: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+
+@media (max-width: 700px) {
+  body.page-painel { padding: 76px 14px 24px; }
+  .btn-voltar { top: 16px; right: 14px; }
+  .actions button { flex: 1 1 100%; }
+}

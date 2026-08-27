@@ -1,0 +1,44 @@
+/* Centraliza o formulário de login sobre o fundo da aplicação. */
+body.page-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #fff url('../imagens/logo a esquerda.png') center / cover fixed no-repeat;
+}
+
+/* Painel visual que envolve os campos e o botão de acesso. */
+.login-container {
+  width: min(100%, 430px);
+  padding: 38px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+/* Título da tela de login. */
+.login-container h2 {
+  margin: 0 0 24px;
+  color: var(--color-primary-dark);
+  font-family: 'Space Grotesk', Arial, sans-serif;
+  font-size: 27px;
+  text-align: center;
+}
+/* Campos usados para as credenciais do usuário. */
+.login-container input {
+  width: 100%;
+  margin: 7px 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: 0;
+}
+/* Destaca o campo que está sendo preenchido. */
+.login-container input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(18, 97, 160, 0.14); }
+.login-container button { width: 100%; margin-top: 14px; }
+/* Reserva espaço e aplica a aparência das mensagens de erro. */
+.error { min-height: 20px; margin-top: 12px; color: var(--color-danger); font-size: 14px; text-align: center; }
+
+@media (max-width: 600px) {
+  body.page-login { place-items: center; }
+}
